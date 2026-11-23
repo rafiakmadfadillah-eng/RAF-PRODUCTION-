@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Paksa semua resource (font, gambar, iframe) dimuat lewat HTTPS -->
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+<title>RAF PRODUCTION - Fotografer & Videografer</title>
+
+<!-- Font modern: Sora (judul) + Manrope (isi). Butuh internet; kalau offline otomatis pakai font sistem -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============ PENGATURAN WARNA (ubah di sini) ============ */
+  :root {
+    --bg-dark: #0e1015;
+    --pink: #c9a96e; /* emas antik (nama lama, nilai baru) */
+    --amber: #e8d8b0; /* champagne */
+    --teal: #b8a98a; /* taupe */
+    --violet: #bf8590; /* rose anggur */
+
+    --text: #f3eee3;
+    --text-soft: rgba(243, 238, 227, 0.72);
+
+    --glass: rgba(255, 240, 210, 0.05);
+    --glass-strong: rgba(255, 240, 210, 0.08);
+    --glass-border: rgba(201, 169, 110, 0.28);
+
+    /* Mau pakai FOTO sebagai background? Hapus tanda komentar di bawah dan ganti nama filenya */
+    /* --bg-image: url("images/background.jpg"); */
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--text);
+    background-color: var(--bg-dark);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  /* ============ BACKGROUND BERGERAK (blob warna) ============ */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: radial-gradient(circle at 20% 0%, #0f2a3d 0%, var(--bg-dark) 65%);
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  .blob.b1 { width: 42vmax; height: 42vmax; background: var(--pink);   top: -12vmax; left: -10vmax; }
+  .blob.b2 { width: 38vmax; height: 38vmax; background: var(--violet); bottom: -14vmax; right: -8vmax; animation-duration: 28s; }
+  .blob.b3 { width: 28vmax; height: 28vmax; background: var(--teal);   top: 40%; left: 55%; opacity: 0.2; animation-duration: 34s; }
+  .blob.b4 { width: 22vmax; height: 22vmax; background: var(--amber);  bottom: 10%; left: 8%; opacity: 0.18; animation-duration: 26s; }
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(6vmax, -5vmax) scale(1.18); }
+  }
+
+  /* ============ TEMA TIDAL-CYBER: grid halus + gelombang ============ */
+  .backdrop::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(140, 220, 240, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140, 220, 240, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%);
+  }
+  .wave {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 200%;
+    height: 22vh;
+    animation: tide 26s linear infinite;
+  }
+  .wave path { fill: rgba(95, 227, 208, 0.07); }
+  .wave.w2 { height: 28vh; animation-duration: 38s; animation-direction: reverse; }
+  .wave.w2 path { fill: rgba(122, 168, 255, 0.06); }
+  @keyframes tide { to { transform: translateX(-50%); } }
+
+  /* ============ HEADER ============ */
+  header {
+    text-align: center;
+    padding: 3.2rem 1.2rem 1.4rem;
+  }
+  .brand {
+    font-family: "Sora", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    letter-spacing: 0.04em;
+    margin: 0;
+    background: linear-gradient(90deg, var(--amber), var(--pink) 45%, var(--teal));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% auto;
+    animation: shine 14s linear infinite;
+  }
+  .tagline {
+    margin: 0.5rem 0 0;
+    color: var(--text-soft);
+    font-size: 1.02rem;
+  }
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+
+  /* ============ NAVIGASI (kaca + pil yang bergeser) ============ */
+  nav {
+    position: sticky;
+    top: 12px;
+    z-index: 20;
+    display: flex;
+    gap: 4px;
+    width: fit-content;
+    max-width: calc(100% - 24px);
+    margin: 0 auto;
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+
+  .nav-pill {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    box-shadow: 0 6px 22px rgba(122, 168, 255, 0.3);
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1), width 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+    pointer-events: none;
+  }
+
+  nav button {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: none;
+    color: var(--text-soft);
+    font: 700 0.95rem "Manrope", sans-serif;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+  nav button:hover { color: #fff; }
+  nav button.active { color: #06121c; }
+
+  button:focus-visible,
+  a:focus-visible,
+  .rating input:focus-visible + label {
+    outline: 3px solid var(--teal);
+    outline-offset: 3px;
+  }
+
+  /* ============ PANEL ============ */
+  main {
+    max-width: 1000px;
+    margin: 2rem auto 4rem;
+    padding: 0 1.2rem;
+  }
+
+  section.panel {
+    display: none;
+    padding: clamp(1.4rem, 4vw, 2.6rem);
+    border-radius: 28px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(160, 235, 250, 0.12);
+  }
+  section.panel.active { display: block; animation: panelIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  section.panel.leaving { display: block; animation: panelOut 0.28s ease-in both; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(26px) scale(0.98); filter: blur(10px); }
+    to   { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes panelOut {
+    from { opacity: 1; transform: none; filter: blur(0); }
+    to   { opacity: 0; transform: translateY(-18px) scale(0.98); filter: blur(8px); }
+  }
+
+  h2 {
+    font-family: "Sora", sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    margin: 0 0 1.2rem;
+  }
+  p { line-height: 1.75; color: var(--text-soft); max-width: 68ch; }
+
+  /* ============ BIODATA ============ */
+  .info-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 1.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .info-item {
+    padding: 1rem 1.2rem;
+    border-radius: 18px;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+  }
+  .info-item:nth-child(1) { border-left: 4px solid var(--pink); }
+  .info-item:nth-child(2) { border-left: 4px solid var(--amber); }
+  .info-item:nth-child(3) { border-left: 4px solid var(--teal); }
+  .info-item small { display: block; color: var(--text-soft); margin-bottom: 4px; }
+  .info-item strong { font-family: "Sora", sans-serif; font-size: 1rem; font-weight: 500; line-height: 1.5; }
+
+  /* ============ KONTAK ============ */
+  .contact { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 1.2rem; }
+  .contact a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.9rem 1.6rem;
+    border-radius: 16px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .contact a:hover { transform: translateY(-4px); }
+  .contact .wa { background: linear-gradient(135deg, #2f9e86, #23788a); box-shadow: 0 8px 24px rgba(47, 158, 134, 0.25); }
+  .contact .ig { background: linear-gradient(135deg, #6d6ad6, #4f86d9); box-shadow: 0 8px 24px rgba(109, 106, 214, 0.25); }
+  .contact .em { background: linear-gradient(135deg, #4a86d8, #6b68d6); box-shadow: 0 8px 24px rgba(74, 134, 216, 0.25); }
+
+  /* ============ PORTOFOLIO ============ */
+  .gallery {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .work {
+    border-radius: 22px;
+    overflow: hidden;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s;
+  }
+  .work:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4); }
+
+  .work .thumb {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: #000;
+    cursor: zoom-in;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+  .work .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .work:hover .thumb img { transform: scale(1.07); }
+
+  .work .meta { padding: 1rem 1.2rem 1.2rem; }
+  .work h3 { font-family: "Sora", sans-serif; font-size: 1.05rem; margin: 0 0 6px; }
+  .work .caption { color: var(--text-soft); font-size: 0.9rem; line-height: 1.6; }
+
+  /* Bintang rating: urutan DOM 5..1 + row-reverse supaya hover/centang menyala dari kiri */
+  .rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    margin-top: 8px;
+    position: relative;
+  }
+  .rating input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .rating label {
+    font-size: 1.6rem;
+    line-height: 1;
+    padding: 0 2px;
+    color: rgba(255, 255, 255, 0.22);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .rating label:hover,
+  .rating label:hover ~ label,
+  .rating input:checked ~ label { color: var(--amber); }
+  .rating label:hover { transform: scale(1.25); }
+
+  .rate-status { min-height: 1.3em; margin-top: 4px; font-size: 0.82rem; color: var(--teal); }
+  .wa-feedback {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    border: 1.5px solid #1fd16c;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.25s, color 0.25s;
+  }
+  .wa-feedback:hover { background: #1fd16c; color: #07140d; }
+
+  /* Lightbox (tampilan foto besar saat diklik) */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    padding: 1.2rem;
+    background: rgba(8, 6, 20, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .lightbox.open { display: flex; animation: fade 0.3s both; }
+  .lightbox img {
+    max-width: min(94vw, 1100px);
+    max-height: 76vh;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    animation: zoomIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .lightbox .lb-caption { max-width: 70ch; text-align: center; color: var(--text-soft); line-height: 1.6; }
+  .lightbox .lb-btn {
+    position: absolute;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-strong);
+    color: #fff;
+    font-size: 1.4rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.25s;
+  }
+  .lightbox .lb-btn:hover { background: var(--pink); transform: scale(1.08); }
+  .lb-close { top: 18px; right: 18px; }
+  .lb-prev  { left: 14px; top: 50%; }
+  .lb-next  { right: 14px; top: 50%; }
+
+  @keyframes fade   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+
+  /* ============ KOLABORASI ============ */
+  .kolaborasi { text-align: center; padding: 1rem 0; }
+  .kolaborasi p { font-size: 1.15rem; margin: 0 auto 1.6rem; color: var(--text); }
+  .cta {
+    display: inline-block;
+    padding: 1rem 2.2rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--amber), var(--pink));
+    color: #1a1033;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(122, 168, 255, 0.3);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .cta:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 16px 38px rgba(122, 168, 255, 0.4); }
+
+  /* ============ PLAYLIST ============ */
+  .player {
+    margin: 1.4rem 0 1.2rem;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-strong);
+    min-height: 120px;
+  }
+  .player iframe { display: block; width: 100%; height: 352px; border: 0; }
+  .player .empty { padding: 2rem 1.4rem; color: var(--text-soft); line-height: 1.7; }
+  .spotify-link {
+    display: inline-block;
+    padding: 0.85rem 1.7rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #1ed760, #0b9b8a);
+    color: #07140d;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(30, 215, 96, 0.35);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .spotify-link:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(30, 215, 96, 0.5); }
+
+  footer { text-align: center; padding: 0 1rem 2.4rem; color: var(--text-soft); font-size: 0.85rem; }
+
+  /* ============ RIWAYAT PENDIDIKAN ============ */
+  .timeline {
+    position: relative;
+    display: grid;
+    gap: 18px;
+    margin-top: 1.6rem;
+    padding-left: 34px;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(var(--amber), var(--teal), var(--pink), var(--violet));
+    opacity: 0.85;
+  }
+  .edu {
+    --c: var(--pink);
+    position: relative;
+    padding: 1.1rem 1.3rem 1.2rem;
+    border-radius: 20px;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+  }
+  .edu:hover { transform: translateX(6px); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35); }
+  .edu::before {
+    content: "";
+    position: absolute;
+    left: -31px;
+    top: 1.35rem;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.12);
+  }
+  .edu .level {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 999px;
+    background: var(--c);
+    color: #1a1033;
+    font: 800 0.8rem "Sora", sans-serif;
+  }
+  .edu h3 { font-family: "Sora", sans-serif; font-size: 1.1rem; margin: 0.7rem 0 0.3rem; }
+  .edu .note { margin: 0 0 0.9rem; font-size: 0.92rem; line-height: 1.6; color: var(--text-soft); }
+  .edu a {
+    display: inline-block;
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--c);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.25s, color 0.25s;
+  }
+  .edu a:hover { background: var(--c); color: #1a1033; }
+
+  /* ============ TEMA KLASIK & ELEGAN (hitam arang + emas) ============ */
+  .backdrop { background: radial-gradient(circle at 50% 0%, #1c1e26 0%, var(--bg-dark) 70%); }
+  .backdrop::before { display: none; }
+  .wave { display: none; }
+  .blob { opacity: 0.14; filter: blur(110px); }
+  .blob.b3, .blob.b4 { opacity: 0.08; }
+
+  .brand, h2, .work h3, .edu h3, .info-item strong, .edu .level {
+    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  }
+  .brand {
+    background-image: linear-gradient(110deg, #a8864f 0%, #c9a96e 38%, #fff6dc 50%, #c9a96e 62%, #a8864f 100%);
+    background-size: 250% 100%;
+    filter: drop-shadow(0 2px 14px rgba(201, 169, 110, 0.3));
+    letter-spacing: 0.12em;
+    animation: sheen 6s ease-in-out infinite;
+  }
+  .tagline { letter-spacing: 0.32em; text-transform: uppercase; font-size: 0.8rem; }
+  @keyframes sheen {
+    0%   { background-position: 150% 0; }
+    60%  { background-position: -50% 0; }
+    100% { background-position: -50% 0; }
+  }
+
+  h2::after {
+    content: "";
+    display: block;
+    width: 56px;
+    height: 2px;
+    margin-top: 0.7rem;
+    background: linear-gradient(90deg, var(--pink), transparent);
+  }
+
+  nav button.active { color: #14110c; }
+  .nav-pill {
+    background: linear-gradient(135deg, #e0c88f, #b8975a);
+    box-shadow: 0 6px 18px rgba(201, 169, 110, 0.25);
+  }
+
+  section.panel {
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(232, 216, 176, 0.12);
+  }
+  .work, .edu, .info-item, .player { border-radius: 14px; }
+  .work:hover, .edu:hover { box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45); }
+
+  .contact .wa, .contact .ig, .contact .em {
+    background: transparent;
+    border: 1px solid rgba(201, 169, 110, 0.55);
+    box-shadow: none;
+    border-radius: 12px;
+  }
+  .contact .wa:hover, .contact .ig:hover, .contact .em:hover {
+    background: var(--pink);
+    color: #14110c;
+  }
+
+  .cta { box-shadow: 0 10px 28px rgba(201, 169, 110, 0.22); }
+  .cta:hover { box-shadow: 0 16px 36px rgba(201, 169, 110, 0.35); }
+
+  .spotify-link {
+    background: linear-gradient(135deg, #e0c88f, #b8975a);
+    color: #14110c;
+    box-shadow: 0 8px 22px rgba(201, 169, 110, 0.25);
+  }
+  .spotify-link:hover { box-shadow: 0 14px 30px rgba(201, 169, 110, 0.4); }
+
+  .wa-feedback { border-color: rgba(201, 169, 110, 0.6); }
+  .wa-feedback:hover { background: var(--pink); color: #14110c; }
+
+  /* ============ RESPONSIF & AKSESIBILITAS ============ */
+  @media (max-width: 560px) {
+    nav button { padding: 0.7rem 1rem; font-size: 0.88rem; }
+    .lb-prev, .lb-next { top: auto; bottom: 18px; }
+    .lb-prev { left: calc(50% - 60px); }
+    .lb-next { right: calc(50% - 60px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="backdrop" aria-hidden="true">
+  <span class="blob b1"></span>
+  <span class="blob b2"></span>
+  <span class="blob b3"></span>
+  <span class="blob b4"></span>
+  <svg class="wave w2" viewBox="0 0 2880 200" preserveAspectRatio="none"><path d="M0,110 C240,50 480,170 720,110 C960,50 1200,170 1440,110 C1680,50 1920,170 2160,110 C2400,50 2640,170 2880,110 L2880,200 L0,200 Z"/></svg>
+  <svg class="wave w1" viewBox="0 0 2880 200" preserveAspectRatio="none"><path d="M0,100 C240,40 480,160 720,100 C960,40 1200,160 1440,100 C1680,40 1920,160 2160,100 C2400,40 2640,160 2880,100 L2880,200 L0,200 Z"/></svg>
+</div>
+
+<header>
+  <h1 class="brand">RAF PRODUCTION</h1>
+  <p class="tagline">Fotografer & Videografer</p>
+</header>
+
+<nav aria-label="Menu utama">
+  <span class="nav-pill" aria-hidden="true"></span>
+  <button class="active" data-target="biodata">Biodata</button>
+  <button data-target="kontak">Kontak</button>
+  <button data-target="portofolio">Portofolio</button>
+  <button data-target="kolaborasi">Kolaborasi</button>
+  <button data-target="playlist">Playlist</button>
+  <button data-target="pendidikan">Pendidikan</button>
+</nav>
+
+<main>
+  <!-- ================= BIODATA ================= -->
+  <section id="biodata" class="panel active">
+    <h2>Biodata</h2>
+    <p>Halo, saya fotografer dan videografer pemula yang masih berkecimpung di area pondok pesantren, dengan passion menangkap momen terbaik lewat lensa kamera. Saya berpengalaman di berbagai jenis proyek, mulai dari dokumentasi acara hingga produksi video kreatif.</p>
+
+    <div class="info-list">
+      <div class="info-item">
+        <small>Nama</small>
+        <strong>Rafi Akhmad Fadillah</strong>
+      </div>
+      <div class="info-item">
+        <small>Keahlian</small>
+        <strong>Fotografi & Videografi, MAKAN BANYAK</strong>
+      </div>
+      <div class="info-item">
+        <small>Lokasi</small>
+        <strong>Jakarta Timur, Pulogadung<br />Purbalingga, Tunjungmuli</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KONTAK ================= -->
+  <section id="kontak" class="panel">
+    <h2>Kontak</h2>
+    <p>Hubungi saya melalui:</p>
+    <div class="contact">
+      <a class="wa" href="https://wa.me/6285717324830" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="ig" href="https://instagram.com/rfiakhdillah_" target="_blank" rel="noopener">Instagram</a>
+      <a class="em" href="mailto:rafimamad45@gmail.com">Email</a>
+    </div>
+  </section>
+
+  <!-- ================= PORTOFOLIO ================= -->
+  <section id="portofolio" class="panel">
+    <h2>Portofolio</h2>
+    <!-- Kartu foto dibuat otomatis dari daftar PORTFOLIO di bagian <script> paling bawah -->
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- ================= KOLABORASI ================= -->
+  <section id="kolaborasi" class="panel">
+    <h2>Kolaborasi</h2>
+    <div class="kolaborasi">
+      <p>Ingin bersama-sama menciptakan karya visual yang menakjubkan? Mari berkolaborasi dengan <strong>RAF PRODUCTION</strong>! Hubungi saya dan kita bawa ide kreatifmu menjadi nyata.</p>
+      <a class="cta" href="https://wa.me/6285717324830" target="_blank" rel="noopener">Ajak kolaborasi lewat WhatsApp</a>
+    </div>
+  </section>
+
+  <!-- ================= PLAYLIST (Spotify) ================= -->
+  <section id="playlist" class="panel">
+    <h2>Playlist</h2>
+    <p>Musik yang menemani saya saat ngoding. Putar langsung di sini atau buka di Spotify.</p>
+    <div class="player" id="spotifyPlayer"></div>
+    <a class="spotify-link" id="spotifyLink" href="#" target="_blank" rel="noopener">Buka di Spotify</a>
+  </section>
+
+  <!-- ================= RIWAYAT PENDIDIKAN ================= -->
+  <section id="pendidikan" class="panel">
+    <h2>Riwayat Pendidikan</h2>
+    <p>Sekolah-sekolah tempat saya pernah belajar. Klik tombol di tiap kartu untuk mengunjungi website atau profil resminya.</p>
+    <div class="timeline" id="eduList"></div>
+  </section>
+</main>
+
+<footer>&copy; <span id="year"></span> RAF PRODUCTION</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Tampilan foto">
+  <button class="lb-btn lb-close" id="lbClose" aria-label="Tutup">&times;</button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Foto sebelumnya">&#8249;</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Foto berikutnya">&#8250;</button>
+  <img id="lbImg" src="" alt="" />
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script>
+  /* ==========================================================
+     1) DAFTAR FOTO PORTOFOLIO  <-- EDIT BAGIAN INI SAJA
+     Cara pakai:
+       - Buat folder "images" di samping file index.html
+       - Masukkan fotomu (mis. foto1.jpg), lalu isi 'src' sesuai nama file
+       - Mau tambah foto? Salin satu blok { ... }, tempel, lalu ubah isinya
+     ========================================================== */
+  const PORTFOLIO = [
+    {
+      src: "image/pt1.jpg",
+      title: "Fashion Show",
+      caption: "Acara memperingati hari pahlawan di SMA IT Madani Purbalingga",
+      date: "10 November 2026",
+      place: "Tunjungmuli, Purbalingga"
+    },
+    {
+      src: "image/pt2.jpg",
+      title: "Fashion Show",
+      caption: "Acara memperingati hari pahlawan di SMA IT Madani Purbalingga",
+      date: "10 November 2026",
+      place: "Tunjungmuli, Purbalingga"
+    },
+{
+      src: "image/pt3.jpg",
+      title: "Fashion Show",
+      caption: "Acara memperingati hari pahlawan di SMA IT Madani Purbalingga",
+      date: "10 November 2026",
+      place: "Tunjungmuli, Purbalingga"
+    }
+
+    /* Contoh menambah foto ke-3 (hapus tanda komentar kalau mau dipakai):
+    ,{
+      src: "images/foto3.jpg",
+      title: "Judul foto",
+      caption: "Deskripsi singkat",
+      date: "Oktober 2026",
+      place: "Nama tempat"
+    }
+    */
+  ];
+
+  /* Gambar pengganti kalau file foto belum ada / salah nama */
+  const FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+    '<stop offset="0" stop-color="#ff4d8d"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>' +
+    '<rect width="800" height="600" fill="url(#g)"/>' +
+    '<text x="400" y="300" fill="#fff" font-family="sans-serif" font-size="34" text-anchor="middle">Ganti dengan fotomu</text>' +
+    '<text x="400" y="345" fill="#fff" fill-opacity=".8" font-family="sans-serif" font-size="22" text-anchor="middle">cek nama file di daftar PORTFOLIO</text>' +
+    '</svg>'
+  );
+
+  /* ==========================================================
+     2) NAVIGASI PANEL + ANIMASI
+     ========================================================== */
+  const navButtons = document.querySelectorAll("nav button");
+  const panels = document.querySelectorAll("section.panel");
+  const pill = document.querySelector(".nav-pill");
+  let busy = false;
+
+  function movePill(btn) {
+    pill.style.width = btn.offsetWidth + "px";
+    pill.style.transform = "translateX(" + btn.offsetLeft + "px)";
+  }
+
+  function showPanel(btn) {
+    if (busy || btn.classList.contains("active")) return;
+    busy = true;
+
+    const current = document.querySelector("section.panel.active");
+    const next = document.getElementById(btn.dataset.target);
+
+    navButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    movePill(btn);
+
+    current.classList.remove("active");
+    current.classList.add("leaving");
+
+    setTimeout(() => {
+      current.classList.remove("leaving");
+      next.classList.add("active");
+      busy = false;
+    }, 280);
+  }
+
+  navButtons.forEach(btn => btn.addEventListener("click", () => showPanel(btn)));
+
+  function syncPill() { movePill(document.querySelector("nav button.active")); }
+  window.addEventListener("resize", syncPill);
+  window.addEventListener("load", syncPill);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncPill);
+
+  /* ==========================================================
+     3) GALERI PORTOFOLIO + RATING
+     ========================================================== */
+  /* ==========================================================
+     PENGIRIMAN NILAI BINTANG  <-- ISI RATING_ENDPOINT & WA_NUMBER
+     RATING_ENDPOINT: link form dari Formspree (contoh: https://formspree.io/f/abcdwxyz)
+     Kalau dikosongkan, nilai hanya tersimpan di browser pengunjung.
+     ========================================================== */
+  const RATING_ENDPOINT = "";
+  const WA_NUMBER = "6285717324830";
+
+  function updateWa(card, item, value) {
+    let text = "Halo RAF PRODUCTION, saya mau kasih masukan untuk foto \"" + item.title + "\". ";
+    if (value) {
+      text = "Halo RAF PRODUCTION, saya menilai foto \"" + item.title + "\" " + value + " dari 5 bintang. ";
+    }
+    card.querySelector(".wa-feedback").href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text);
+  }
+
+  function sendRating(item, value, statusEl) {
+    if (!RATING_ENDPOINT) {
+      statusEl.textContent = "Nilai tersimpan di perangkat ini.";
+      return;
+    }
+    statusEl.textContent = "Mengirim...";
+    fetch(RATING_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        foto: item.title,
+        file: item.src,
+        nilai: value,
+        waktu: new Date().toISOString()
+      })
+    })
+      .then(r => { if (!r.ok) throw new Error("gagal"); statusEl.textContent = "Terima kasih, nilai terkirim!"; })
+      .catch(() => { statusEl.textContent = "Nilai belum terkirim. Coba lagi nanti."; });
+  }
+
+  const gallery = document.getElementById("gallery");
+
+  function saveRating(i, value) {
+    try { localStorage.setItem("raf-rating-" + i, value); } catch (e) { /* abaikan jika diblokir */ }
+  }
+  function loadRating(i) {
+    try { return localStorage.getItem("raf-rating-" + i); } catch (e) { return null; }
+  }
+
+  const labels = { 5: "Sangat Baik", 4: "Baik", 3: "Cukup", 2: "Kurang", 1: "Sangat Kurang" };
+
+  PORTFOLIO.forEach((item, i) => {
+    const card = document.createElement("article");
+    card.className = "work";
+
+    let stars = "";
+    for (let s = 5; s >= 1; s--) {
+      stars +=
+        '<input type="radio" id="star' + s + '-' + i + '" name="rating' + i + '" value="' + s + '" />' +
+        '<label for="star' + s + '-' + i + '" title="' + labels[s] + '">&#9733;</label>';
+    }
+
+    card.innerHTML =
+      '<button class="thumb" type="button" aria-label="Perbesar foto: ' + item.title + '">' +
+        '<img loading="lazy" alt="' + item.title + '" />' +
+      '</button>' +
+      '<div class="meta">' +
+        '<h3></h3>' +
+        '<div class="caption"></div>' +
+        '<div class="rating" role="radiogroup" aria-label="Beri nilai">' + stars + '</div>' +
+        '<div class="rate-status" aria-live="polite"></div>' +
+        '<a class="wa-feedback" target="_blank" rel="noopener">Beri masukan lewat WhatsApp</a>' +
+      '</div>';
+
+    const img = card.querySelector("img");
+    img.src = item.src;
+    img.onerror = function () { this.onerror = null; this.src = FALLBACK; };
+
+    card.querySelector("h3").textContent = item.title;
+    card.querySelector(".caption").innerHTML = "";
+    const cap = card.querySelector(".caption");
+    [item.caption, "Waktu ambil: " + item.date, "Tempat: " + item.place].forEach(line => {
+      const div = document.createElement("div");
+      div.textContent = line;
+      cap.appendChild(div);
+    });
+
+    const saved = loadRating(i);
+    if (saved) {
+      const r = card.querySelector('input[value="' + saved + '"]');
+      if (r) r.checked = true;
+    }
+    card.querySelectorAll(".rating input").forEach(input => {
+      input.addEventListener("change", () => {
+        saveRating(i, input.value);
+        updateWa(card, item, input.value);
+        sendRating(item, input.value, card.querySelector(".rate-status"));
+      });
+    });
+
+    updateWa(card, item, loadRating(i));
+    card.querySelector(".thumb").addEventListener("click", () => openLightbox(i));
+    gallery.appendChild(card);
+  });
+
+  /* ==========================================================
+     4) LIGHTBOX
+     ========================================================== */
+  const lightbox = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbCaption = document.getElementById("lbCaption");
+  let lbIndex = 0;
+  let lastFocus = null;
+
+  function renderLightbox() {
+    const item = PORTFOLIO[lbIndex];
+    lbImg.onerror = function () { this.onerror = null; this.src = FALLBACK; };
+    lbImg.src = item.src;
+    lbImg.alt = item.title;
+    lbCaption.textContent = item.title + " • " + item.date + " • " + item.place;
+    // mulai ulang animasi zoom
+    lbImg.style.animation = "none";
+    void lbImg.offsetWidth;
+    lbImg.style.animation = "";
+  }
+  function openLightbox(i) {
+    lastFocus = document.activeElement;
+    lbIndex = i;
+    renderLightbox();
+    lightbox.classList.add("open");
+    document.getElementById("lbClose").focus();
+  }
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    if (lastFocus) lastFocus.focus();
+  }
+  function stepLightbox(dir) {
+    lbIndex = (lbIndex + dir + PORTFOLIO.length) % PORTFOLIO.length;
+    renderLightbox();
+  }
+
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbPrev").addEventListener("click", () => stepLightbox(-1));
+  document.getElementById("lbNext").addEventListener("click", () => stepLightbox(1));
+  lightbox.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener("keydown", e => {
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") stepLightbox(-1);
+    if (e.key === "ArrowRight") stepLightbox(1);
+  });
+
+  /* ==========================================================
+     5) PLAYLIST SPOTIFY  <-- GANTI LINK DI BAWAH INI
+     Cara dapat link: Spotify > buka playlist > titik tiga > Share > Copy link to playlist
+     ========================================================== */
+  const SPOTIFY_URL = "https://open.spotify.com/playlist/24JwS9ZiMJepdbbj3gFFfx?si=MKIcCcAqTzKuD-JYEBi1Xw";
+
+  (function setupSpotify() {
+    const box = document.getElementById("spotifyPlayer");
+    const link = document.getElementById("spotifyLink");
+    const m = SPOTIFY_URL.match(/open\.spotify\.com\/(playlist|album|track|artist)\/([A-Za-z0-9]+)/);
+
+    if (!m || SPOTIFY_URL.indexOf("GANTI") !== -1) {
+      const msg = document.createElement("div");
+      msg.className = "empty";
+      msg.textContent = "Playlist belum dipasang. Ganti nilai SPOTIFY_URL di bagian script dengan link playlist Spotify kamu.";
+      box.appendChild(msg);
+      link.style.display = "none";
+      return;
+    }
+
+    const frame = document.createElement("iframe");
+    frame.src = "https://open.spotify.com/embed/" + m[1] + "/" + m[2] + "?utm_source=generator&theme=0";
+    frame.title = "Playlist Spotify";
+    frame.loading = "lazy";
+    frame.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    box.appendChild(frame);
+    link.href = "https://open.spotify.com/" + m[1] + "/" + m[2];
+  })();
+
+  /* ==========================================================
+     6) RIWAYAT PENDIDIKAN  <-- EDIT NAMA SEKOLAH & KETERANGAN DI SINI
+     level: jenjang | name: nama sekolah | note: keterangan singkat
+     url: link website sekolah | linkText: tulisan tombol | color: warna kartu
+     Tambah/hapus sekolah dengan menyalin/menghapus satu blok { ... }
+     ========================================================== */
+  const EDUCATION = [
+    {
+      level: "SD",
+      name: "Sekolah Dasar",
+      note: "Ganti dengan nama SD kamu. Profil resmi sekolah ada di data Kemendikdasmen.",
+      url: "https://sekolah.data.kemendikdasmen.go.id/profil-sekolah/10D71595-2BF5-E011-80D6-0F1D9BA39654",
+      linkText: "Lihat profil sekolah",
+      color: "var(--amber)"
+    },
+    {
+      level: "SMP",
+      name: "Sekolah Menengah Pertama",
+      note: "Ganti dengan nama SMP kamu. Profil resmi sekolah ada di data Kemendikdasmen.",
+      url: "https://sekolah.data.kemendikdasmen.go.id/profil-sekolah/18A5A5F0-42FA-4616-803A-48CD6386543E",
+      linkText: "Lihat profil sekolah",
+      color: "var(--teal)"
+    },
+    {
+      level: "SMA",
+      name: "Ma'had As-Salaam, SMA Qur'an As-Salaam Gunungputri",
+      note: "Boarding school tahfidz Al-Qur'an di Gunungputri, Bogor, Jawa Barat.",
+      url: "https://mahad-assalaam.sch.id/",
+      linkText: "Kunjungi website",
+      color: "var(--pink)"
+    },
+    {
+      level: "SMA",
+      name: "SMA IT Madani Purbalingga",
+      note: "Pondok Pesantren Madani, Tunjungmuli, Karangmoncol, Purbalingga, Jawa Tengah.",
+      url: "https://smaitmadanipurbalingga.sch.id/",
+      linkText: "Kunjungi website",
+      color: "var(--violet)"
+    }
+  ];
+
+  (function renderEducation() {
+    const list = document.getElementById("eduList");
+    EDUCATION.forEach(item => {
+      const card = document.createElement("article");
+      card.className = "edu";
+      card.style.setProperty("--c", item.color);
+
+      const badge = document.createElement("span");
+      badge.className = "level";
+      badge.textContent = item.level;
+
+      const title = document.createElement("h3");
+      title.textContent = item.name;
+
+      const note = document.createElement("p");
+      note.className = "note";
+      note.textContent = item.note;
+
+      const a = document.createElement("a");
+      a.href = item.url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = item.linkText;
+
+      card.append(badge, title, note, a);
+      list.appendChild(card);
+    });
+  })();
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
